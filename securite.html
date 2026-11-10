@@ -2,7 +2,7 @@
 <!--
   Masque AI — page "Sécurité du site"
   Cette page explique aux visiteurs (et au jury) les protections mises en place.
-  Elle n'a pas de JavaScript : c'est une page purement informative.
+  Son seul JavaScript est la protection anti-clickjacking (js/anti-cadre.js).
 -->
 <html lang="fr">
 <head>
@@ -10,13 +10,27 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <!-- Même politique de sécurité que la page principale,
-       en encore plus stricte : aucun script n'est autorisé ici. -->
+       sans connect-src : default-src 'none' bloque déjà le réseau.
+       Seul script autorisé : la protection anti-clickjacking. -->
   <meta http-equiv="Content-Security-Policy"
-        content="default-src 'none'; style-src 'self'; img-src 'self'; font-src 'self'; form-action 'none'; base-uri 'none'">
+        content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; form-action 'none'; base-uri 'none'; require-trusted-types-for 'script'; upgrade-insecure-requests">
   <meta name="referrer" content="no-referrer">
 
   <title>Sécurité du site — Masque AI</title>
-  <link rel="stylesheet" href="css/style.css">
+  <!-- ============================================================
+       BALISE DE SÉCURITÉ : protection anti-clickjacking
+       Chargée en premier et SANS "defer" pour agir avant l'affichage.
+       Voir les explications dans js/anti-cadre.js.
+
+       BALISE DE SÉCURITÉ : intégrité des fichiers (SRI)
+       L'attribut integrity contient l'empreinte (hash SHA-384) du fichier.
+       Si quelqu'un modifie le fichier sur l'hébergement, l'empreinte
+       ne correspond plus et le navigateur REFUSE de l'utiliser.
+       Après chaque modification d'un fichier CSS ou JS, relancer :
+           python outils/calculer-sri.py
+       ============================================================ -->
+  <script src="js/anti-cadre.js" integrity="sha384-+0E3i8DqePn9LbfIVw2+/F7cMXVH17Sma+U33zS3TZ/E7EXue5Sn9tZrlIP4exAw"></script>
+  <link rel="stylesheet" href="css/style.css" integrity="sha384-pQVFpG8K+AScbh5lOtzl/P4HTD5iIZV5lNFqGr3i0U2rT8w2DohHfzNxYqlKOqJj">
   <link rel="icon" href="img/icone.svg" type="image/svg+xml">
 </head>
 
@@ -91,14 +105,37 @@
          <a href="https://cyber.gouv.fr/" target="_blank" rel="noopener noreferrer">site de l'ANSSI</a>.</p>
     </section>
 
+    <section class="mesure">
+      <h2>Intégrité des fichiers (SRI)</h2>
+      <p class="menace">Menace : un fichier du site modifié sur l'hébergement pour y glisser du code malveillant.</p>
+      <p>Chaque script et feuille de style porte son empreinte numérique
+         (<code>integrity="sha384-…"</code>). Si le fichier ne correspond plus
+         à son empreinte, le navigateur refuse de l'utiliser.</p>
+    </section>
+
+    <section class="mesure">
+      <h2>Protection contre le clickjacking</h2>
+      <p class="menace">Menace : un site pirate qui affiche cette page dans un cadre invisible pour vous faire cliquer à votre insu.</p>
+      <p>Si la page détecte qu'elle est affichée dans un cadre, elle se cache
+         immédiatement et tente de s'ouvrir en plein écran.</p>
+    </section>
+
+    <section class="mesure">
+      <h2>Connexion chiffrée uniquement</h2>
+      <p class="menace">Menace : un fichier chargé sans chiffrement, modifiable sur un Wi-Fi public.</p>
+      <p>La directive <code>upgrade-insecure-requests</code> force le navigateur à charger
+         chaque fichier en HTTPS, et GitHub Pages sert le site en HTTPS.</p>
+    </section>
+
     <div class="limites">
       <h2>Limites connues</h2>
       <ul>
         <li>Les noms, prénoms et adresses postales ne sont pas détectés.</li>
         <li>Seuls les formats français sont reconnus (IBAN FR, téléphones 0X ou +33).</li>
-        <li>L'hébergement GitHub Pages ne permet pas de configurer les en-têtes serveur
-            X-Frame-Options, X-Content-Type-Options et <code>frame-ancestors</code>,
-            qui ne fonctionnent pas dans une balise &lt;meta&gt;.</li>
+        <li>Sans back-end, les en-têtes serveur X-Frame-Options, X-Content-Type-Options,
+            Permissions-Policy et <code>frame-ancestors</code> ne peuvent pas être ajoutés :
+            ils ne fonctionnent pas dans une balise &lt;meta&gt;. La protection
+            anti-clickjacking en JavaScript compense en partie.</li>
       </ul>
     </div>
   </main>

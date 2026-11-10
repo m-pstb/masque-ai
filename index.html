@@ -37,7 +37,7 @@
                                     qui transforment du texte en code (anti-XSS)
        ============================================================ -->
   <meta http-equiv="Content-Security-Policy"
-        content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; connect-src 'none'; form-action 'none'; base-uri 'none'; require-trusted-types-for 'script'">
+        content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; connect-src 'none'; form-action 'none'; base-uri 'none'; require-trusted-types-for 'script'; upgrade-insecure-requests">
 
   <!-- ============================================================
        BALISE DE SÉCURITÉ N°2 : Referrer-Policy
@@ -51,7 +51,20 @@
   <title>Masque AI</title>
 
   <!-- Feuille de style et icône : fichiers locaux, autorisés par la CSP. -->
-  <link rel="stylesheet" href="css/style.css">
+  <!-- ============================================================
+       BALISE DE SÉCURITÉ : protection anti-clickjacking
+       Chargée en premier et SANS "defer" pour agir avant l'affichage.
+       Voir les explications dans js/anti-cadre.js.
+
+       BALISE DE SÉCURITÉ : intégrité des fichiers (SRI)
+       L'attribut integrity contient l'empreinte (hash SHA-384) du fichier.
+       Si quelqu'un modifie le fichier sur l'hébergement, l'empreinte
+       ne correspond plus et le navigateur REFUSE de l'utiliser.
+       Après chaque modification d'un fichier CSS ou JS, relancer :
+           python outils/calculer-sri.py
+       ============================================================ -->
+  <script src="js/anti-cadre.js" integrity="sha384-+0E3i8DqePn9LbfIVw2+/F7cMXVH17Sma+U33zS3TZ/E7EXue5Sn9tZrlIP4exAw"></script>
+  <link rel="stylesheet" href="css/style.css" integrity="sha384-pQVFpG8K+AScbh5lOtzl/P4HTD5iIZV5lNFqGr3i0U2rT8w2DohHfzNxYqlKOqJj">
   <link rel="icon" href="img/icone.svg" type="image/svg+xml">
 
   <!-- ============================================================
@@ -59,7 +72,7 @@
        "defer" : le script s'exécute une fois la page entièrement chargée.
        Un script écrit directement dans la page serait bloqué par la CSP.
        ============================================================ -->
-  <script src="js/app.js" defer></script>
+  <script src="js/app.js" integrity="sha384-Bg9RlmDX0HHKvnaBNSmB/MLFuKXKIHaWAS8tgpnTxoFXyeqF58NrJxmIPRytDSsn" defer></script>
 </head>
 
 <body>

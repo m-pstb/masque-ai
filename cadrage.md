@@ -68,5 +68,7 @@ Hébergement prévu : **GitHub Pages** (gratuit, HTTPS automatique, obligatoire 
 - [x] Les 6 types de données de l'exemple fictif sont tous masqués.
 - [x] Aucune requête réseau n'est possible depuis la page (vérifié : `fetch` bloqué par la CSP).
 - [x] Un texte contenant du code HTML ou JavaScript n'est jamais exécuté (vérifié : `innerHTML` bloqué).
+- [x] Un fichier CSS modifié sans mise à jour de son empreinte est refusé (SRI).
+- [x] La page affichée dans une `<iframe>` est cachée (anti-clickjacking).
 - [x] Aucune erreur dans la console du navigateur.
 - [x] Affichage correct sur ordinateur et sur téléphone.

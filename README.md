@@ -22,12 +22,15 @@ masque-ai/
 ├── css/
 │   └── style.css     Mise en forme
 ├── js/
+│   ├── anti-cadre.js Protection contre le clickjacking
 │   └── app.js        Règles de détection et gestion des boutons
 ├── fonts/          Polices hébergées dans le site (licence OFL)
 ├── img/
 │   ├── logo.svg        Logo (fond clair)
 │   ├── logo-sombre.svg Logo (mode sombre)
 │   └── icone.svg       Icône de l'onglet
+├── outils/
+│   └── calculer-sri.py Recalcule les empreintes SRI après une modification
 ├── cadrage.md        Cadrage du projet et MVP
 ├── EXPLICATIONS.md   Explication du code et des balises de sécurité
 └── README.md         Ce fichier
@@ -45,6 +48,14 @@ python -m http.server 8000
 
 Puis ouvrez <http://localhost:8000> dans le navigateur.
 
+## Modifier le CSS ou le JavaScript
+
+Chaque fichier CSS et JS est protégé par une empreinte SRI. **Après toute modification**, recalculez-les, sinon le navigateur refusera le fichier :
+
+```bash
+python outils/calculer-sri.py
+```
+
 ## Mettre en ligne sur GitHub Pages
 
 1. Sur GitHub, dépôt → **Settings** → **Pages**.
@@ -58,6 +69,9 @@ Puis ouvrez <http://localhost:8000> dans le navigateur.
 | Content-Security-Policy stricte | `<meta>` dans les pages HTML | Injection de script (XSS), chargement de ressources externes, fuite du texte par le réseau |
 | `require-trusted-types-for 'script'` | Dans la CSP | Utilisation de `innerHTML` et des fonctions qui transforment du texte en code |
 | `font-src 'self'` | Dans la CSP | Polices chargées uniquement depuis le site (pas de Google Fonts) |
+| SRI : attribut `integrity="sha384-…"` | `<script>` et `<link>` | Fichier modifié sur l'hébergement (supply chain) |
+| Script anti-cadre | `js/anti-cadre.js` | Clickjacking (page affichée dans un cadre invisible) |
+| `upgrade-insecure-requests` | Dans la CSP | Fichier chargé sans chiffrement |
 | Referrer-Policy `no-referrer` | `<meta>` | Fuite de l'adresse de la page vers d'autres sites |
 | `textContent` au lieu de `innerHTML` | `js/app.js` | XSS : le texte collé n'est jamais interprété comme du code |
 | `spellcheck="false"`, `autocomplete="off"` | Zone de saisie | Envoi du texte à un correcteur en ligne, mémorisation par le navigateur |
