@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<!--
+  Masque AI — page "Sécurité du site"
+  Cette page explique aux visiteurs (et au jury) les protections mises en place.
+  Elle n'a pas de JavaScript : c'est une page purement informative.
+-->
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Même politique de sécurité que la page principale,
+       en encore plus stricte : aucun script n'est autorisé ici. -->
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'none'; style-src 'self'; img-src 'self'; font-src 'self'; form-action 'none'; base-uri 'none'">
+  <meta name="referrer" content="no-referrer">
+
+  <title>Sécurité du site — Masque AI</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="img/icone.svg" type="image/svg+xml">
+</head>
+
+<body>
+  <a class="evitement" href="#contenu">Aller directement au contenu</a>
+
+  <header class="entete">
+    <a href="index.html" class="logo">
+      <picture>
+        <source srcset="img/logo-sombre.svg" media="(prefers-color-scheme: dark)">
+        <img src="img/logo.svg" alt="Masque AI" width="160" height="44">
+      </picture>
+    </a>
+    <nav aria-label="Navigation principale">
+      <a href="index.html">Anonymiser</a>
+      <a href="securite.html" aria-current="page">Sécurité du site</a>
+    </nav>
+  </header>
+
+  <main class="page-texte" id="contenu">
+    <h1>Comment ce site vous protège</h1>
+    <p class="intro">Le texte que vous collez peut contenir des données sensibles.
+       Le site est donc conçu pour qu'il ne puisse jamais quitter votre navigateur.
+       Voici chaque protection, et la menace à laquelle elle répond.</p>
+
+    <section class="mesure">
+      <h2>Aucun serveur, aucun stockage</h2>
+      <p class="menace">Menace : une base de données piratée, un historique qui fuit.</p>
+      <p>Le texte est analysé sur votre appareil. Il n'est ni envoyé, ni enregistré :
+         fermer l'onglet l'efface. Le site n'utilise ni cookie, ni stockage local,
+         ni outil de statistiques.</p>
+    </section>
+
+    <section class="mesure">
+      <h2>Politique de sécurité du contenu (CSP)</h2>
+      <p class="menace">Menace : un script malveillant injecté qui lirait votre texte et l'enverrait ailleurs.</p>
+      <p>Une règle placée en tête de chaque page interdit au navigateur de charger
+         quoi que ce soit venant d'un autre site, et bloque toute connexion réseau
+         depuis le JavaScript (<code>connect-src 'none'</code>). Même un code injecté
+         ne pourrait rien envoyer.</p>
+    </section>
+
+    <section class="mesure">
+      <h2>Protection contre l'injection de code (XSS)</h2>
+      <p class="menace">Menace : un texte collé contenant du code qui s'exécuterait dans la page.</p>
+      <p>Le texte est toujours affiché comme du texte, jamais interprété comme du code :
+         le site n'utilise pas <code>innerHTML</code>. La directive
+         <code>require-trusted-types-for 'script'</code> fait bloquer par le navigateur
+         toute tentative de l'utiliser.</p>
+    </section>
+
+    <section class="mesure">
+      <h2>Zone de saisie protégée</h2>
+      <p class="menace">Menace : un correcteur orthographique en ligne qui recevrait votre texte.</p>
+      <p>Le correcteur et la saisie automatique sont désactivés
+         (<code>spellcheck="false"</code>, <code>autocomplete="off"</code>),
+         et la taille du texte est limitée (<code>maxlength</code>).</p>
+    </section>
+
+    <section class="mesure">
+      <h2>Aucune dépendance externe</h2>
+      <p class="menace">Menace : une bibliothèque ou une police hébergée ailleurs, modifiée par un pirate.</p>
+      <p>Pas de bibliothèque JavaScript. Les polices et les images sont hébergées
+         dans le site lui-même. Moins de code tiers, moins de risque.</p>
+    </section>
+
+    <section class="mesure">
+      <h2>Liens sortants sécurisés</h2>
+      <p class="menace">Menace : une page ouverte dans un nouvel onglet qui prendrait le contrôle de celui-ci.</p>
+      <p>Les liens externes utilisent <code>rel="noopener noreferrer"</code>, par exemple
+         ce lien vers le
+         <a href="https://cyber.gouv.fr/" target="_blank" rel="noopener noreferrer">site de l'ANSSI</a>.</p>
+    </section>
+
+    <div class="limites">
+      <h2>Limites connues</h2>
+      <ul>
+        <li>Les noms, prénoms et adresses postales ne sont pas détectés.</li>
+        <li>Seuls les formats français sont reconnus (IBAN FR, téléphones 0X ou +33).</li>
+        <li>L'hébergement GitHub Pages ne permet pas de configurer les en-têtes serveur
+            X-Frame-Options, X-Content-Type-Options et <code>frame-ancestors</code>,
+            qui ne fonctionnent pas dans une balise &lt;meta&gt;.</li>
+      </ul>
+    </div>
+  </main>
+
+  <footer class="pied">
+    <p>Masque AI, projet étudiant de Bachelor 3 Cybersécurité. Aucune donnée collectée.</p>
+  </footer>
+</body>
+</html>

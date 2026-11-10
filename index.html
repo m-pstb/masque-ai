@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<!--
+  Masque AI — page principale
+  Structure de la page :
+    1. en-tête (logo + navigation)
+    2. accueil : titre + phrase de démonstration animée
+    3. l'outil : texte d'origine -> texte anonymisé + bilan
+    4. trois promesses de sécurité
+    5. pied de page
+  Aucune donnée n'est envoyée sur Internet : tout se passe dans le navigateur.
+-->
+<html lang="fr">
+<head>
+  <!-- Encodage des caractères : évite les problèmes d'accents
+       et certaines attaques qui jouent sur un encodage mal interprété. -->
+  <meta charset="UTF-8">
+
+  <!-- Adapte l'affichage aux écrans de téléphone. -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- ============================================================
+       BALISE DE SÉCURITÉ N°1 : Content-Security-Policy (CSP)
+       C'est la protection la plus importante du site.
+       Elle dit au navigateur ce que la page a le droit de charger :
+         default-src 'none'      -> par défaut, RIEN n'est autorisé
+         script-src 'self'       -> scripts uniquement depuis notre site
+                                    (donc pas de script injecté dans la page)
+         style-src 'self'        -> styles uniquement depuis notre site
+         img-src 'self'          -> images uniquement depuis notre site
+         font-src 'self'         -> polices uniquement depuis notre site
+         connect-src 'none'      -> AUCUNE connexion réseau depuis le JavaScript :
+                                    le texte ne peut pas être envoyé ailleurs
+         form-action 'none'      -> aucun formulaire ne peut être envoyé
+         base-uri 'none'         -> empêche de détourner les liens relatifs
+         require-trusted-types-for 'script'
+                                 -> bloque innerHTML et les fonctions dangereuses
+                                    qui transforment du texte en code (anti-XSS)
+       ============================================================ -->
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; connect-src 'none'; form-action 'none'; base-uri 'none'; require-trusted-types-for 'script'">
+
+  <!-- ============================================================
+       BALISE DE SÉCURITÉ N°2 : Referrer-Policy
+       Quand on clique sur un lien, le navigateur indique normalement
+       au site suivant de quelle page on vient. "no-referrer" supprime
+       cette information : rien ne fuit vers les sites externes.
+       ============================================================ -->
+  <meta name="referrer" content="no-referrer">
+
+  <meta name="description" content="Anonymisez un texte avant de le coller dans une intelligence artificielle. Fonctionne entièrement dans votre navigateur.">
+  <title>Masque AI</title>
+
+  <!-- Feuille de style et icône : fichiers locaux, autorisés par la CSP. -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="img/icone.svg" type="image/svg+xml">
+
+  <!-- ============================================================
+       Script chargé depuis un FICHIER séparé (jamais de code dans la page).
+       "defer" : le script s'exécute une fois la page entièrement chargée.
+       Un script écrit directement dans la page serait bloqué par la CSP.
+       ============================================================ -->
+  <script src="js/app.js" defer></script>
+</head>
+
+<body>
+  <!-- Lien d'évitement : permet aux personnes qui naviguent au clavier
+       d'aller directement à l'outil (accessibilité). -->
+  <a class="evitement" href="#outil">Aller directement à l'outil</a>
+
+  <header class="entete">
+    <!-- Logo : version claire par défaut, version sombre si l'appareil est en mode sombre. -->
+    <a href="index.html" class="logo">
+      <picture>
+        <source srcset="img/logo-sombre.svg" media="(prefers-color-scheme: dark)">
+        <img src="img/logo.svg" alt="Masque AI" width="160" height="44">
+      </picture>
+    </a>
+    <nav aria-label="Navigation principale">
+      <a href="index.html" aria-current="page">Anonymiser</a>
+      <a href="securite.html">Sécurité du site</a>
+    </nav>
+  </header>
+
+  <main>
+    <!-- ===================== 1. ACCUEIL ===================== -->
+    <section class="accueil">
+      <h1>Ce que l'IA<br>ne verra pas.</h1>
+
+      <!-- Phrase de démonstration animée (100 % fictive, en CSS uniquement).
+           Chaque donnée est surlignée, puis recouverte d'un coup de marqueur,
+           puis remplacée par son étiquette. aria-hidden : les lecteurs d'écran
+           lisent à la place la phrase "sr-only" juste en dessous. -->
+      <p class="demo" aria-hidden="true">
+        Rappeler Léa au
+        <span class="donnee" data-tag="[TÉLÉPHONE]">06 12 34 56 78</span>
+        ou lui écrire sur
+        <span class="donnee" data-tag="[EMAIL]">lea@exemple.fr</span>,
+        virement vers
+        <span class="donnee" data-tag="[IBAN]">FR76 3000 6000 0112…</span>
+      </p>
+      <p class="sr-only">Exemple : un numéro de téléphone, une adresse e-mail et un IBAN sont remplacés par des étiquettes.</p>
+
+      <p class="chapeau">Collez votre texte, Masque AI remplace les e-mails, téléphones, IBAN,
+         cartes bancaires, numéros de sécurité sociale et adresses IP par des étiquettes.
+         Le tout sans quitter votre navigateur.</p>
+      <a class="bouton principal" href="#outil">Anonymiser un texte</a>
+    </section>
+
+    <!-- ===================== 2. L'OUTIL ===================== -->
+    <section class="outil" id="outil" aria-labelledby="titre-outil">
+      <h2 id="titre-outil">Anonymiser un texte</h2>
+
+      <div class="zones">
+        <!-- ZONE 1 : texte d'origine -->
+        <div class="zone">
+          <label for="texte-origine">Votre texte</label>
+          <!-- ==========================================================
+               Attributs de sécurité de la zone de saisie :
+                 autocomplete="off"   -> le navigateur ne mémorise pas le texte
+                 spellcheck="false"   -> pas de correcteur orthographique :
+                                         certains correcteurs envoient le texte
+                                         à un serveur pour l'analyser
+                 autocapitalize="off" -> pas de modification automatique
+                 maxlength="20000"    -> limite la taille du texte
+                                         (évite de bloquer la page)
+               ========================================================== -->
+          <textarea id="texte-origine"
+                    rows="11"
+                    maxlength="20000"
+                    autocomplete="off"
+                    spellcheck="false"
+                    autocapitalize="off"
+                    placeholder="Collez ici l'e-mail, le compte rendu ou l'extrait à envoyer à l'IA."></textarea>
+          <div class="boutons">
+            <!-- type="button" : ces boutons ne soumettent aucun formulaire. -->
+            <button type="button" id="bouton-anonymiser" class="bouton principal">Anonymiser</button>
+            <button type="button" id="bouton-exemple" class="bouton">Essayer un exemple fictif</button>
+            <button type="button" id="bouton-effacer" class="bouton discret">Tout effacer</button>
+          </div>
+        </div>
+
+        <!-- ZONE 2 : texte anonymisé.
+             Ce n'est pas une zone de saisie : le JavaScript y place le résultat
+             avec textContent et des balises <span> pour les étiquettes
+             (jamais avec innerHTML). -->
+        <div class="zone resultat">
+          <p class="libelle" id="libelle-resultat">Texte anonymisé</p>
+          <div id="texte-resultat"
+               class="sortie"
+               role="textbox"
+               aria-readonly="true"
+               aria-multiline="true"
+               aria-labelledby="libelle-resultat"
+               tabindex="0"><span class="vide">Le texte nettoyé apparaîtra ici.</span></div>
+          <div class="boutons">
+            <button type="button" id="bouton-copier" class="bouton principal" disabled>Copier le texte anonymisé</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bilan : combien de données ont été masquées, par type.
+           aria-live="polite" : les lecteurs d'écran annoncent le résultat. -->
+      <div class="bilan" aria-live="polite">
+        <p id="message">Aucun texte analysé pour l'instant.</p>
+        <ul id="liste-bilan"></ul>
+      </div>
+
+      <p class="avertissement">
+        Les noms, prénoms et adresses postales ne sont pas détectés.
+        Relisez toujours le texte avant de l'envoyer.
+      </p>
+    </section>
+
+    <!-- ===================== 3. PROMESSES ===================== -->
+    <section class="promesses" aria-label="Ce que le site garantit">
+      <div class="promesse">
+        <h2>Rien ne part.</h2>
+        <p>Le site n'a pas de serveur, et sa politique de sécurité bloque toute
+           connexion réseau. Votre texte ne peut pas être envoyé.</p>
+      </div>
+      <div class="promesse">
+        <h2>Rien ne reste.</h2>
+        <p>Aucun cookie, aucun stockage, aucun historique.
+           Fermer l'onglet efface tout.</p>
+      </div>
+      <div class="promesse">
+        <h2>Rien ne s'exécute.</h2>
+        <p>Le texte collé est toujours affiché comme du texte.
+           Même s'il contient du code, il reste inoffensif.</p>
+      </div>
+      <a class="lien-securite" href="securite.html">Voir le détail des protections</a>
+    </section>
+  </main>
+
+  <footer class="pied">
+    <p>Masque AI, projet étudiant de Bachelor 3 Cybersécurité. Aucune donnée collectée.</p>
+  </footer>
+</body>
+</html>
